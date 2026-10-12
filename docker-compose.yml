@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5050:5050"
+    environment:
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pratica
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-dados:/data
+    networks:
+      - pratica
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 10
+
+networks:
+  pratica:
+
+volumes:
+  redis-dados:
+
